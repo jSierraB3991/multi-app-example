@@ -1,0 +1,40 @@
+name: Ionic Build and Deploy
+
+on:
+  push:
+    branches:
+      - main  # Cambia esto si usas otra rama
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18  # Usa la versión que necesites
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Ionic Project
+        run: |
+          npm install -g @ionic/cli
+          ionic build --prod
+
+      - name: Verify Dist Folder
+        run: ls -la dist/
+
+      - name: Commit and Push Build
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add dist/
+          git commit -m "Automated Build - $(date)"
+          git push
+
